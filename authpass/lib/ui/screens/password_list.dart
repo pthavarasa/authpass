@@ -1071,6 +1071,38 @@ class _PasswordListContentState extends State<PasswordListContent>
                               widget.onEntrySelected(context, entry.entry,
                                   EntrySelectionType.activeOpen);
                             },
+                            onLongPress: () async {
+                              await showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content: const Text(
+                                        'Are you sure you want to delete?'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                        onPressed: () {
+                                          entry.entry.file.deleteEntry(entry.entry);
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -1309,12 +1341,14 @@ class PasswordEntryTile extends StatelessWidget {
     @required this.isSelected,
     @required this.filterQuery,
     this.onTap,
+    this.onLongPress,
   }) : super(key: key);
 
   final EntryViewModel vm;
   final bool isSelected;
   final String filterQuery;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
   Widget _defaultIcon(Color fgColor, ThemeData theme, double size) =>
       EntryIcon.defaultIcon(vm, fgColor, theme, size);
@@ -1343,6 +1377,7 @@ class PasswordEntryTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
